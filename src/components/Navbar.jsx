@@ -21,7 +21,7 @@ const ProfileIcon = ({ className = "" }) => (
 );
 
 const Navbar = () => {
-	const { user } = useAppContext();
+	const { user, handleLogout } = useAppContext();
 	const navigate = useNavigate();
 
 	const handleNavigation = (path) => {
@@ -64,16 +64,25 @@ const Navbar = () => {
 					</Link>
 				</div>
 				{user ? (
-					<button
-						onClick={() => handleNavigation("/admin")}
-						className='flex items-center gap-2 bg-indigo-50 hover:bg-indigo-100 px-3 py-2 rounded-lg transition group'
-						title='Go to profile'
-					>
-						<ProfileIcon className='text-indigo-600 group-hover:text-indigo-800 transition' />
-						<span className='text-indigo-700 font-semibold'>
-							{user.username}
-						</span>
-					</button>
+					<div className='flex items-center gap-4'>
+						<button
+							onClick={() => handleNavigation("/admin")}
+							className='flex items-center gap-2 bg-indigo-50 hover:bg-indigo-100 px-3 py-2 rounded-lg transition group'
+							title='Go to profile'
+						>
+							<ProfileIcon className='text-indigo-600 group-hover:text-indigo-800 transition' />
+							<span className='text-indigo-700 font-semibold'>
+								{user.username}
+							</span>
+						</button>
+						<button
+							onClick={handleLogout}
+							className='bg-red-500 text-white px-4 py-2 rounded-lg font-medium shadow hover:bg-red-600 transition'
+							title='Logout'
+						>
+							Logout
+						</button>
+					</div>
 				) : (
 					<button
 						onClick={() => handleNavigation("/admin")}

@@ -1,5 +1,5 @@
-import React from "react";
-import Navbar from "../components/Navbar";
+import { useAppContext } from "../context/AppContext";
+import { Link } from "react-router-dom"; // <-- Import Outlet
 
 // Example BlogCard component for reusability and cleaner code
 const BlogCard = ({ title, description }) => (
@@ -19,20 +19,14 @@ const CommentCard = ({ comment, user }) => (
 
 const Dashboard = () => {
 	// Example data (replace with real data from API)
-	const blogs = [
-		{
-			title: "Blog Title 1",
-			description: "Short description of the blog post...",
-		},
-		{
-			title: "Blog Title 2",
-			description: "Short description of the blog post...",
-		},
-		{
-			title: "Blog Title 3",
-			description: "Short description of the blog post...",
-		},
-	];
+	const { posts } = useAppContext();
+
+	const blogs = posts.slice(0, 3).map((post) => ({
+		title: post.title,
+		description: post.description || "No description available.",
+	}));
+
+	// Example comments (replace with real data from API)
 	const comments = [
 		{ comment: "This is a sample comment.", user: "User1" },
 		{ comment: "This is another sample comment.", user: "User2" },
@@ -40,7 +34,7 @@ const Dashboard = () => {
 
 	return (
 		<>
-			<main className='min-h-screen bg-gradient-to-br from-indigo-50 to-blue-100 py-8'>
+			<main className='pt-28 min-h-screen bg-gradient-to-br from-indigo-50 to-blue-100 py-8'>
 				<section className='container mx-auto px-4'>
 					<h1 className='text-3xl font-bold text-indigo-800 mb-2'>Dashboard</h1>
 					<p className='text-gray-500 mb-8'>Welcome to your dashboard!</p>
@@ -50,33 +44,32 @@ const Dashboard = () => {
 						</h2>
 						<ul className='flex flex-wrap gap-4'>
 							<li>
-								<a
-									href='/add'
+								<Link
+									to='/admin/add'
 									className='inline-block bg-indigo-600 hover:bg-indigo-700 text-white px-4 py-2 rounded-lg font-medium transition'
 								>
 									Add Blog Post
-								</a>
+								</Link>
 							</li>
 							<li>
-								<a
-									href='/list'
+								<Link
+									to='/admin/list'
 									className='inline-block bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded-lg font-medium transition'
 								>
 									List Blog Posts
-								</a>
+								</Link>
 							</li>
 							<li>
-								<a
-									href='/comments'
+								<Link
+									to='/admin/comments'
 									className='inline-block bg-indigo-400 hover:bg-indigo-500 text-white px-4 py-2 rounded-lg font-medium transition'
 								>
 									Manage Comments
-								</a>
+								</Link>
 							</li>
 						</ul>
 					</div>
 				</section>
-
 				<section className='container mx-auto px-4 mb-10'>
 					<h2 className='text-xl font-semibold text-indigo-700 mb-4'>
 						Latest Blogs
@@ -91,7 +84,6 @@ const Dashboard = () => {
 						))}
 					</div>
 				</section>
-
 				<section className='container mx-auto px-4'>
 					<h2 className='text-xl font-semibold text-indigo-700 mb-4'>
 						Latest Comments

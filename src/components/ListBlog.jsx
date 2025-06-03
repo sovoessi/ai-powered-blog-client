@@ -15,8 +15,7 @@ const latestBlogs = [
 const ListBlog = () => {
 	return (
 		<>
-			<Navbar />
-			<div className='min-h-screen bg-gradient-to-br from-indigo-50 to-blue-100 py-8'>
+			<div className='pt-28 min-h-screen bg-gradient-to-br from-indigo-50 to-blue-100 py-8'>
 				<div className='container mx-auto px-4'>
 					<h1 className='text-3xl font-bold text-indigo-800 mb-6'>
 						List of Blogs
@@ -58,7 +57,7 @@ const ListBlog = () => {
 						</table>
 					</div>
 					<div className='flex justify-end mb-12'>
-						<button  className='px-5 py-2 bg-indigo-600 hover:bg-indigo-700 text-white rounded-lg font-medium shadow transition'>
+						<button className='px-5 py-2 bg-indigo-600 hover:bg-indigo-700 text-white rounded-lg font-medium shadow transition'>
 							Add New Blog
 						</button>
 					</div>

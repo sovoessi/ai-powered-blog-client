@@ -1,4 +1,5 @@
-import { useState, useRef, useEffect } from "react";
+import { useState, useRef, useEffect, useContext } from "react";
+import { AppContext } from "../context/AppContext";
 
 import Quill from "quill";
 
@@ -15,10 +16,20 @@ const AddBlog = () => {
 		isPublished: false,
 	});
 	const [success, setSuccess] = useState(false);
-	const [isPublished, setIsPublished] = useState(true);
+	const [imageFile, setImageFile] = useState(null);
+
+	const { createPost, toast } = useContext(AppContext);
 
 	const handleChange = (e) => {
 		setForm({ ...form, [e.target.name]: e.target.value });
+	};
+
+	const handleFileChange = (e) => {
+		setImageFile(e.target.files[0]);
+	};
+
+	const handleCheckboxChange = (e) => {
+		setForm({ ...form, isPublished: e.target.checked });
 	};
 
 	// Dummy generateContent function to avoid errors
@@ -29,38 +40,66 @@ const AddBlog = () => {
 	const handleSubmit = (e) => {
 		e.preventDefault();
 		// TODO: Add API call here
-		setSuccess(true);
-		setForm({
-			title: "",
-			description: "",
-			category: "",
-			image: "",
-		});
-		setTimeout(() => setSuccess(false), 2500);
+		const postData = {
+			...form,
+			image: imageFile, // Use the file object here
+			description: quillRef.current
+				? quillRef.current.root.innerHTML
+				: form.description,
+		};
+
+		try {
+			if (!postData.title || !postData.description || !postData.category) {
+				throw new Error("Please fill in all required fields.");
+			}
+		} catch (error) {
+			toast(error.message);
+			return;
+		}
+
+		try {
+			createPost(postData);
+			setSuccess(true);
+		} catch (error) {
+			console.error("Error creating post:", error);
+			toast("Failed to create post. Please try again.");
+			return;
+		} finally {
+			setSuccess(false);
+			// Reset form after submission
+			setForm({
+				title: "",
+				description: "",
+				category: "",
+				image: "",
+				isPublished: false,
+			});
+			setImageFile(null); // Reset file input
+		}
 	};
 
 	useEffect(() => {
 		// Cleanup Quill instance on unmount
 		// Initialize Quill editor on component mount
-	if (!quillRef.current && editorRef.current) {
-		quillRef.current = new Quill(editorRef.current, {
-			theme: "snow",
-			modules: {
-				toolbar: [
-					[{ header: [1, 2, false] }],
-					["bold", "italic", "underline"],
-					["link", "image"],
-					["clean"],
-				],
-			},
-			formats: ["header", "bold", "italic", "underline", "link", "image"],
-		});
+		if (!quillRef.current && editorRef.current) {
+			quillRef.current = new Quill(editorRef.current, {
+				theme: "snow",
+				modules: {
+					toolbar: [
+						[{ header: [1, 2, false] }],
+						["bold", "italic", "underline"],
+						["link", "image"],
+						["clean"],
+					],
+				},
+				formats: ["header", "bold", "italic", "underline", "link", "image"],
+			});
 
-		quillRef.current.on("text-change", () => {
-			const content = quillRef.current.root.innerHTML;
-			setForm((prev) => ({ ...prev, description: content }));
-		});
-	}
+			quillRef.current.on("text-change", () => {
+				const content = quillRef.current.root.innerHTML;
+				setForm((prev) => ({ ...prev, description: content }));
+			});
+		}
 		return () => {
 			if (quillRef.current) {
 				quillRef.current = null;
@@ -157,37 +196,7 @@ const AddBlog = () => {
 							<option value='Education'>Education</option>
 						</select>
 					</div>
-					{/* <div>
-						<label
-							htmlFor='image'
-							className='block text-indigo-700 font-medium mb-1'
-						>
-							Image URL
-						</label>
-						<input
-							type='url'
-							id='image'
-							name='image'
-							value={form.image}
-							onChange={handleChange}
-							required
-							className='w-full px-4 py-2 border border-indigo-100 rounded-lg focus:ring-2 focus:ring-indigo-200 bg-white text-indigo-900'
-							placeholder='https://example.com/image.jpg'
-						/>
-					</div> */}
 
-					{/* <p className='text-sm text-indigo-600 mt-2'>Upload thumbnail </p>
-						<input
-							type='file'
-							id='thumbnail'
-							name='thumbnail'
-							accept='image/*'
-							className='w-full mt-2 border border-indigo-100 rounded-lg focus:ring-2 focus:ring-indigo-200 bg-white text-indigo-900'
-					
-							onChange={(e) => setForm({ ...form, image: e.target.files[0] })}
-						/> */}
-
-					{/* Thumbnail Upload */}
 					<div>
 						<label
 							htmlFor='thumbnail'
@@ -223,10 +232,13 @@ const AddBlog = () => {
 									name='thumbnail'
 									accept='image/*'
 									className='hidden'
-									onChange={(e) =>
-										setForm({ ...form, image: e.target.files[0] })
-									}
+									onChange={handleFileChange}
 								/>
+								{imageFile && (
+									<span className='text-sm text-indigo-600 truncate max-w-[160px]'>
+										{imageFile.name}
+									</span>
+								)}
 							</label>
 							{form.image && (
 								<span className='text-sm text-indigo-600 truncate max-w-[160px]'>
@@ -245,10 +257,10 @@ const AddBlog = () => {
 						<label className='inline-flex items-center'>
 							<input
 								type='checkbox'
-								name='publish'
+								name='isPublished'
 								className='form-checkbox h-5 w-5 text-indigo-600 border-gray-300 rounded focus:ring-indigo-500'
-								onChange={handleChange}
-								checked={isPublished}
+								onChange={handleCheckboxChange}
+								checked={form.isPublished}
 							/>
 							<span className='ml-2 text-sm text-gray-700'>Yes</span>
 						</label>

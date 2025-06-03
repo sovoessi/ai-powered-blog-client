@@ -34,20 +34,19 @@ const App = () => {
 				<Route
 					path='/admin'
 					element={user ? <Dashboard /> : <Login />}
-				>
-					<Route
-						path='add'
-						element={<AddBlog />}
-					/>
-					<Route
-						path='list'
-						element={<ListBlog />}
-					/>
-					<Route
-						path='comments'
-						element={<Comments />}
-					/>
-				</Route>
+				/>
+				<Route
+					path='/admin/add'
+					element={<AddBlog />}
+				/>
+				<Route
+					path='/admin/list'
+					element={<ListBlog />}
+				/>
+				<Route
+					path='/admin/comments'
+					element={<Comments />}
+				/>
 			</Routes>
 			<Footer />
 		</>
