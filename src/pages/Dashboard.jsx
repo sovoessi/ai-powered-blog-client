@@ -1,11 +1,26 @@
 import { useAppContext } from "../context/AppContext";
-import { Link } from "react-router-dom"; // <-- Import Outlet
+import { Link } from "react-router-dom";
+import { useMemo } from "react";
+
+// Safely truncate and render HTML
+const getTruncatedHtml = (html, maxLength = 100) => {
+	const div = document.createElement("div");
+	div.innerHTML = html;
+	const text = div.textContent || div.innerText || "";
+	const truncated =
+		text.length > maxLength ? text.slice(0, maxLength) + "..." : text;
+	return { __html: truncated };
+};
 
 // Example BlogCard component for reusability and cleaner code
 const BlogCard = ({ title, description }) => (
-	<div className='bg-white p-6 rounded-xl shadow-md hover:shadow-xl transition-shadow duration-300 border border-indigo-100'>
-		<h3 className='text-lg font-semibold text-indigo-700 mb-2'>{title}</h3>
-		<p className='text-gray-600'>{description}</p>
+	<div className='bg-white p-6 rounded-xl shadow-md hover:shadow-xl transition-shadow duration-300 border border-indigo-100 flex flex-col h-full'>
+		<h3 className='text-lg font-semibold text-indigo-700 mb-2 truncate'>
+			{title}
+		</h3>
+		<p className='text-gray-600 flex-1 mb-2 min-h-[3em]'>
+			<span dangerouslySetInnerHTML={getTruncatedHtml(description, 100)} />
+		</p>
 	</div>
 );
 
@@ -18,15 +33,17 @@ const CommentCard = ({ comment, user }) => (
 );
 
 const Dashboard = () => {
-	// Example data (replace with real data from API)
-	const { posts } = useAppContext();
+	const { posts, loading, error, fetchPosts } = useAppContext();
 
-	const blogs = posts.slice(0, 3).map((post) => ({
-		title: post.title,
-		description: post.description || "No description available.",
-	}));
+	const blogs = useMemo(
+		() =>
+			(posts || []).slice(0, 3).map((post) => ({
+				title: post.title,
+				description: post.description || "No description available.",
+			})),
+		[posts]
+	);
 
-	// Example comments (replace with real data from API)
 	const comments = [
 		{ comment: "This is a sample comment.", user: "User1" },
 		{ comment: "This is another sample comment.", user: "User2" },
@@ -67,35 +84,59 @@ const Dashboard = () => {
 									Manage Comments
 								</Link>
 							</li>
+							<li>
+								<button
+									onClick={fetchPosts}
+									className='inline-block bg-green-500 hover:bg-green-600 text-white px-4 py-2 rounded-lg font-medium transition'
+									disabled={loading}
+								>
+									{loading ? "Refreshing..." : "Refresh Posts"}
+								</button>
+							</li>
 						</ul>
+						{error && <p className='text-red-500 mt-2'>{error}</p>}
 					</div>
 				</section>
 				<section className='container mx-auto px-4 mb-10'>
 					<h2 className='text-xl font-semibold text-indigo-700 mb-4'>
 						Latest Blogs
 					</h2>
-					<div className='grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6'>
-						{blogs.map((blog, idx) => (
-							<BlogCard
-								key={idx}
-								title={blog.title}
-								description={blog.description}
-							/>
-						))}
-					</div>
+					{loading ? (
+						<p className='text-gray-400'>Loading blogs...</p>
+					) : (
+						<div className='grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6'>
+							{blogs.length > 0 ? (
+								blogs.map((blog, idx) => (
+									<BlogCard
+										key={idx}
+										title={blog.title}
+										description={blog.description}
+									/>
+								))
+							) : (
+								<p className='text-gray-400 col-span-full'>
+									No blogs available.
+								</p>
+							)}
+						</div>
+					)}
 				</section>
 				<section className='container mx-auto px-4'>
 					<h2 className='text-xl font-semibold text-indigo-700 mb-4'>
 						Latest Comments
 					</h2>
 					<div>
-						{comments.map((c, idx) => (
-							<CommentCard
-								key={idx}
-								comment={c.comment}
-								user={c.user}
-							/>
-						))}
+						{comments.length > 0 ? (
+							comments.map((c, idx) => (
+								<CommentCard
+									key={idx}
+									comment={c.comment}
+									user={c.user}
+								/>
+							))
+						) : (
+							<p className='text-gray-400'>No comments available.</p>
+						)}
 					</div>
 				</section>
 			</main>

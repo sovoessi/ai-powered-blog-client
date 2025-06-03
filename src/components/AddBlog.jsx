@@ -154,8 +154,8 @@ const AddBlog = () => {
 							></div>
 							<button
 								type='button'
-								className='absolute bottom-1 right-2 ml-2 text-xs bg-black/70 text-white  px-4 py-1.5 rounded hover:underline cursor-pointer 
-								hover:bg-white text-indigo-600 hover:text-indigo-700 font-medium text-sm mb-2'
+								className='absolute bottom-1 right-2 ml-2 text-xs bg-black/70 text-white px-4 py-1.5 rounded hover:underline cursor-pointer 
+								hover:bg-white hover:text-indigo-700 font-medium mb-2'
 								onClick={generateContent}
 							>
 								Generate with AI

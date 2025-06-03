@@ -19,8 +19,10 @@ export const AppProvider = ({ children }) => {
 
 	const API_URL = import.meta.env.VITE_API_URL;
 
+	// Fetch all posts from the server
 	const fetchPosts = async () => {
 		setLoading(true);
+		setError(null);
 		try {
 			const response = await axios.get(`${API_URL}/posts`);
 			setPosts(response.data);
@@ -30,6 +32,11 @@ export const AppProvider = ({ children }) => {
 		} finally {
 			setLoading(false);
 		}
+	};
+
+	// Refresh posts: always fetch latest from server, reset error/loading
+	const refreshPosts = async () => {
+		await fetchPosts();
 	};
 
 	// Create a new post
@@ -198,6 +205,7 @@ export const AppProvider = ({ children }) => {
 		user,
 		toast,
 		fetchPosts,
+        refreshPosts,
 		createPost,
 		updatePost,
 		deletePost,
