@@ -1,6 +1,8 @@
 import { useState, useRef, useEffect, useContext } from "react";
 import { AppContext } from "../context/AppContext";
 
+import { parse } from "marked";
+
 import Quill from "quill";
 
 const AddBlog = () => {
@@ -18,7 +20,10 @@ const AddBlog = () => {
 	const [success, setSuccess] = useState(false);
 	const [imageFile, setImageFile] = useState(null);
 
-	const { createPost, toast } = useContext(AppContext);
+	const { createPost, toast, generateContent, loading } =
+		useContext(AppContext);
+
+	const [localLoading, setLocalLoading] = useState(false);
 
 	const handleChange = (e) => {
 		setForm({ ...form, [e.target.name]: e.target.value });
@@ -32,17 +37,36 @@ const AddBlog = () => {
 		setForm({ ...form, isPublished: e.target.checked });
 	};
 
-	// Dummy generateContent function to avoid errors
-	const generateContent = () => {
-		alert("AI content generation is not implemented yet.");
+	const handleGenerate = async () => {
+		if (!form.title && !form.category) {
+			return toast("Please enter a title or category for AI generation.");
+		}
+		setLocalLoading(true);
+		try {
+			const prompt = `Write a blog post about "${form.title}" in the "${form.category}" category.`;
+			const result = await generateContent({ prompt });
+			if (result && result.content) {
+				if (quillRef.current) {
+					quillRef.current.root.innerHTML = result.content;
+				}
+				setForm((prev) => ({ ...prev, description: parse(result.content) }));
+				toast("AI content generated!");
+			} else {
+				toast("Failed to generate content.");
+			}
+		} catch (error) {
+			console.error("Error generating content:", error);
+			toast("Error generating content.");
+		} finally {
+			setLocalLoading(false);
+		}
 	};
 
-	const handleSubmit = (e) => {
+	const handleSubmit = async (e) => {
 		e.preventDefault();
-		// TODO: Add API call here
 		const postData = {
 			...form,
-			image: imageFile, // Use the file object here
+			image: imageFile,
 			description: quillRef.current
 				? quillRef.current.root.innerHTML
 				: form.description,
@@ -57,8 +81,9 @@ const AddBlog = () => {
 			return;
 		}
 
+		setLocalLoading(true);
 		try {
-			createPost(postData);
+			await createPost(postData);
 			setSuccess(true);
 		} catch (error) {
 			console.error("Error creating post:", error);
@@ -66,7 +91,6 @@ const AddBlog = () => {
 			return;
 		} finally {
 			setSuccess(false);
-			// Reset form after submission
 			setForm({
 				title: "",
 				description: "",
@@ -74,7 +98,8 @@ const AddBlog = () => {
 				image: "",
 				isPublished: false,
 			});
-			setImageFile(null); // Reset file input
+			setImageFile(null);
+			setLocalLoading(false);
 		}
 	};
 
@@ -155,22 +180,13 @@ const AddBlog = () => {
 							<button
 								type='button'
 								className='absolute bottom-1 right-2 ml-2 text-xs bg-black/70 text-white px-4 py-1.5 rounded hover:underline cursor-pointer 
-								hover:bg-white hover:text-indigo-700 font-medium mb-2'
-								onClick={generateContent}
+                                hover:bg-white hover:text-indigo-700 font-medium mb-2 disabled:opacity-60 disabled:cursor-not-allowed'
+								onClick={handleGenerate}
+								disabled={loading || localLoading}
 							>
-								Generate with AI
+								{localLoading ? "Generating..." : "Generate with AI"}
 							</button>
 						</div>
-						{/* <textarea
-							id='description'
-							name='description'
-							value={form.description}
-							onChange={handleChange}
-							required
-							rows={4}
-							className='w-full px-4 py-2 border border-indigo-100 rounded-lg focus:ring-2 focus:ring-indigo-200 bg-white text-indigo-900'
-							placeholder='Write a short description...'
-						></textarea> */}
 					</div>
 					<div>
 						<label
@@ -267,9 +283,10 @@ const AddBlog = () => {
 					</div>
 					<button
 						type='submit'
-						className='w-full bg-indigo-600 hover:bg-indigo-700 text-white font-semibold py-3 rounded-lg shadow transition'
+						className='w-full bg-indigo-600 hover:bg-indigo-700 text-white font-semibold py-3 rounded-lg shadow transition disabled:opacity-60 disabled:cursor-not-allowed'
+						disabled={loading || localLoading}
 					>
-						Add Blog Post
+						{loading || localLoading ? "Submitting..." : "Add Blog Post"}
 					</button>
 				</form>
 			</div>

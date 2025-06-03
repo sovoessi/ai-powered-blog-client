@@ -121,6 +121,25 @@ export const AppProvider = ({ children }) => {
 		}
 	};
 
+	const generateContent = async (postData) => {
+		setLoading(true);
+		try {
+			const response = await axios.post(`${API_URL}/posts/generate`, postData, {
+				headers: {
+					Authorization: `Bearer ${token}`,
+				},
+			});
+			return response.data; // Return generated content
+		}
+		catch (err) {
+			setError(err.message);
+			toast.error("Failed to generate content.");
+			return null; // Return null on error
+		} finally {
+			setLoading(false);
+		}
+	}
+
 	// Handle user login
 	const login = async (email, password) => {
 		setLoading(true);
@@ -205,7 +224,8 @@ export const AppProvider = ({ children }) => {
 		user,
 		toast,
 		fetchPosts,
-        refreshPosts,
+		refreshPosts,
+		generateContent,
 		createPost,
 		updatePost,
 		deletePost,
