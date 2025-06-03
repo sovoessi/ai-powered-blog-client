@@ -1,10 +1,14 @@
-import { useNavigate } from "react-router-dom";
+import { useAppContext } from "../context/AppContext";
 
 const Navbar = () => {
-	const navigate = useNavigate();
+	const { navigate, user } = useAppContext();
+
+	// Function to handle navigation
 	const handleNavigation = (path) => {
 		navigate(path);
 	};
+
+	console.log("User in Navbar:", user);
 
 	return (
 		<nav className='bg-white/90 px-4 sm:px-10 xl:px-32 py-4 shadow-md backdrop-blur-lg fixed w-full z-50'>
@@ -41,12 +45,16 @@ const Navbar = () => {
 						Contact
 					</a>
 				</div>
-				<button
-					onClick={() => handleNavigation("/admin")}
-					className='bg-indigo-600 text-white px-4 py-2 rounded-lg font-medium shadow hover:bg-indigo-700 transition'
-				>
-					Login
-				</button>
+				{user ? (
+					<p>Welcome, {user.username}</p>
+				) : (
+					<button
+						onClick={() => handleNavigation("/admin")}
+						className='bg-indigo-600 text-white px-4 py-2 rounded-lg font-medium shadow hover:bg-indigo-700 transition'
+					>
+						Login
+					</button>
+				)}
 			</div>
 		</nav>
 	);

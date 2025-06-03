@@ -1,10 +1,13 @@
 import { useState } from "react";
+import { useAppContext } from "../context/AppContext";
 
 const Login = () => {
 	const [formData, setFormData] = useState({
 		email: "",
 		password: "",
 	});
+
+	const {login } = useAppContext();
 
 	const handleChange = (e) => {
 		const { name, value } = e.target;
@@ -17,6 +20,7 @@ const Login = () => {
 	const handleSubmit = (e) => {
 		e.preventDefault();
 		// Handle login logic here (e.g., API call)
+		login(formData.email, formData.password);
 		console.log("Login submitted:", formData);
 	};
 
