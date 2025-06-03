@@ -26,6 +26,7 @@ export const AppProvider = ({ children }) => {
             setPosts(response.data);
         } catch (err) {
             setError(err.message);
+            toast("Failed to fetch posts.");
         } finally {
             setLoading(false);
         }
@@ -100,7 +101,7 @@ export const AppProvider = ({ children }) => {
             handleLogin(response.data);
         } catch (err) {
             setError(err.message);
-            toast.error("Login failed. Please check your credentials.");
+            toast("Login failed. Please check your credentials.");
         } finally {
             setLoading(false);
         }
@@ -127,7 +128,7 @@ export const AppProvider = ({ children }) => {
         sessionStorage.setItem("token", userData.token);
         sessionStorage.setItem("user", JSON.stringify(userData.user));
         navigate("/admin");
-        toast.success("Logged in successfully!");
+        toast("Logged in successfully!");
     };
 
     // Handle user logout
@@ -137,7 +138,7 @@ export const AppProvider = ({ children }) => {
         sessionStorage.removeItem("token");
         sessionStorage.removeItem("user");
         navigate("/");
-        toast.success("Logged out successfully!");
+        toast("Logged out successfully!");
     };
 
     // Fetch token from session storage on initial load

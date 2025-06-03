@@ -1,65 +1,20 @@
 import React from "react";
 import Card from "./Card";
+
+import { useAppContext } from "../context/AppContext";
+
 const CardList = () => {
-	const data = [
-		{
-			title: "Sample Blog Post 1",
-			description: "This is a sample description for blog post 1.",
-			category: "Technology",
-			image: "https://via.placeholder.com/150",
-			_id: "1",
-		},
-		{
-			title: "Sample Blog Post 2",
-			description: "This is a sample description for blog post 2.",
-			category: "Health",
-			image: "https://via.placeholder.com/150",
-			_id: "2",
-		},
-		{
-			title: "Sample Blog Post 3",
-			description: "This is a sample description for blog post 3.",
-			category: "Lifestyle",
-			image: "https://via.placeholder.com/150",
-			_id: "3",
-		},
-		{
-			title: "Sample Blog Post 4",
-			description: "This is a sample description for blog post 4.",
-			category: "Travel",
-			image: "https://via.placeholder.com/150",
-			_id: "4",
-		},
-		{
-			title: "Sample Blog Post 5",
-			description: "This is a sample description for blog post 5.",
-			category: "Business",
-			image: "https://via.placeholder.com/150",
-			_id: "5",
-		},
-		{
-			title: "Sample Blog Post 6",
-			description: "This is a sample description for blog post 6.",
-			category: "Education",
-			image: "https://via.placeholder.com/150",
-			_id: "6",
-		},
-	];
-	const blogCategories = [
-		"All",
-		"Business",
-		"Technology",
-		"Health",
-		"Lifestyle",
-		"Travel",
-		"Education",
-	];
+	const { posts } = useAppContext();
+
+	const categories = ["All", ...new Set(posts.map((item) => item.category))];
+
 	const [selectedCategory, setSelectedCategory] = React.useState("All");
 	const handleCategoryChange = (category) => {
 		setSelectedCategory(category);
 	};
 
-	const cardList = data
+	const cardList = posts
+		.sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt))
 		.filter((item) => {
 			if (selectedCategory === "All") {
 				return true;
@@ -76,7 +31,7 @@ const CardList = () => {
 	return (
 		<div>
 			<div className='flex flex-wrap justify-center gap-3 sm:gap-5 my-8'>
-				{blogCategories.map((category) => (
+				{categories.map((category) => (
 					<button
 						key={category}
 						onClick={() => handleCategoryChange(category)}

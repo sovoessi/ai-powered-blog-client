@@ -9,21 +9,18 @@ import Comments from "./components/Comments";
 import Login from "./pages/Login";
 import Navbar from "./components/Navbar";
 import Footer from "./components/Footer";
-import {ToastContainer} from "react-toastify";
+import { ToastContainer } from "react-toastify";
 
 import "react-toastify/dist/ReactToastify.css";
-
 
 import "quill/dist/quill.snow.css";
 
 const App = () => {
-
-
-	const {user} = useAppContext();
+	const { user } = useAppContext();
 
 	return (
 		<>
-		<ToastContainer/>
+			<ToastContainer />
 			<Navbar />
 			<Routes>
 				<Route
@@ -37,19 +34,20 @@ const App = () => {
 				<Route
 					path='/admin'
 					element={user ? <Dashboard /> : <Login />}
-				/>
-				<Route
-					path='/add'
-					element={<AddBlog />}
-				/>
-				<Route
-					path='/list'
-					element={<ListBlog />}
-				/>
-				<Route
-					path='/comments'
-					element={<Comments />}
-				/>
+				>
+					<Route
+						path='add'
+						element={<AddBlog />}
+					/>
+					<Route
+						path='list'
+						element={<ListBlog />}
+					/>
+					<Route
+						path='comments'
+						element={<Comments />}
+					/>
+				</Route>
 			</Routes>
 			<Footer />
 		</>
