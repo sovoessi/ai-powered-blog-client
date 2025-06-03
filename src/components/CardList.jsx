@@ -22,10 +22,12 @@ const CardList = () => {
 			return item.category === selectedCategory;
 		})
 		.map((item) => (
+			// Using Card component for each item	
+			<div className='h-full' key={item._id}>	
 			<Card
-				key={item._id}
 				data={item}
 			/>
+			</div>
 		));
 
 	return (

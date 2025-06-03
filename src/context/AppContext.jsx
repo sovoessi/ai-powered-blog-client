@@ -54,11 +54,20 @@ export const AppProvider = ({ children }) => {
 				},
 			});
 			setPosts((prevPosts) => [...prevPosts, response.data]);
-			toast.success("Post created successfully!");
+			toast("Post created successfully!");
 			navigate("/admin");
 		} catch (err) {
 			setError(err.message);
-			toast.error("Failed to create post.");
+			// Check for invalid/expired token
+			if (
+				err.response &&
+				(err.response.status === 401 || err.response.status === 403)
+			) {
+				toast("Session expired or unauthorized. Please log in again.");
+				handleLogout(); // Optionally log out the user
+			} else {
+				toast("Failed to create post.");
+			}
 		} finally {
 			setLoading(false);
 		}
