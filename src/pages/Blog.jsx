@@ -27,12 +27,12 @@ const Blog = () => {
 				});
 			} else {
 				setBlogData(null);
-				toast.error("Blog not found.");
+				toast("Blog not found.");
 				console.error("Blog not found for ID:", id);
 			}
 		} catch (error) {
 			console.error("Error fetching blog data:", error);
-			toast.error("Failed to load blog data.");
+			toast("Failed to load blog data.");
 			setBlogData(null);
 		} finally {
 			setLoading(false);

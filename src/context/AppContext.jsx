@@ -93,7 +93,7 @@ export const AppProvider = ({ children }) => {
 				prevPosts.map((post) => (post._id === id ? response.data : post))
 			);
 			toast.success("Post updated successfully!");
-			navigate("/list");
+			navigate("/admin");
 		} catch (err) {
 			setError(err.message);
 			toast.error("Failed to update post.");
@@ -112,10 +112,10 @@ export const AppProvider = ({ children }) => {
 				},
 			});
 			setPosts((prevPosts) => prevPosts.filter((post) => post._id !== id));
-			toast.success("Post deleted successfully!");
+			toast("Post deleted successfully!");
 		} catch (err) {
 			setError(err.message);
-			toast.error("Failed to delete post.");
+			toast("Failed to delete post.");
 		} finally {
 			setLoading(false);
 		}
